@@ -1,0 +1,482 @@
+// Global variables for quiz state
+let currentState = 'welcome';
+let currentQuestion = 0;
+let answers = {};
+let result = null;
+let buttonHover = false;
+let pieChartAngles = [];
+let pieChartLabels = [];
+let pieChartHover = -1;
+
+// Color schemes
+const pieChartColors = {
+  adventurous: [65, 105, 225],    // Royal Blue
+  peaceful: [255, 182, 193],      // Light Pink
+  structured: [60, 179, 113],     // Medium Sea Green
+  creative: [238, 130, 238],      // Violet
+  diplomatic: [255, 165, 0],      // Orange
+  analytical: [147, 112, 219],    // Medium Purple
+  energetic: [255, 99, 71],       // Tomato
+  thoughtful: [72, 209, 204]      // Medium Turquoise
+};
+
+// Country profiles with descriptions and MBTI types
+const countryProfiles = {
+  INTJ: {
+    country: "Japan",
+    description: "Japan's precision, technological innovation, and strategic thinking align perfectly with your analytical and visionary nature. The culture's respect for tradition combined with futuristic innovation mirrors your balanced perspective.",
+    traits: ["structured", "analytical"]
+  },
+  INTP: {
+    country: "Germany",
+    description: "Germany's logical approach to life, emphasis on theoretical thinking, and philosophical heritage match your analytical mind. The country's commitment to innovation and efficiency speaks to your problem-solving nature.",
+    traits: ["analytical", "structured"]
+  },
+  ENTJ: {
+    country: "Singapore",
+    description: "Singapore's efficiency, strategic planning, and ambitious development reflect your leadership qualities. The nation's blend of tradition and modernity suits your forward-thinking approach.",
+    traits: ["structured", "diplomatic"]
+  },
+  ENTP: {
+    country: "Netherlands",
+    description: "The Netherlands' innovative spirit, open-mindedness, and progressive thinking align with your love for possibilities. The Dutch direct communication style matches your straightforward nature.",
+    traits: ["creative", "diplomatic"]
+  },
+  INFJ: {
+    country: "Norway",
+    description: "Norway's commitment to social harmony, peaceful lifestyle, and deep appreciation for nature reflects your idealistic and caring personality. The culture's emphasis on work-life balance suits your thoughtful nature.",
+    traits: ["peaceful", "thoughtful"]
+  },
+  INFP: {
+    country: "New Zealand",
+    description: "New Zealand's natural beauty, creative culture, and peaceful lifestyle resonate with your idealistic and authentic self. The country's respect for indigenous culture and nature aligns with your values.",
+    traits: ["creative", "peaceful"]
+  },
+  ENFJ: {
+    country: "Denmark",
+    description: "Denmark's focus on community welfare, social harmony, and positive lifestyle matches your people-oriented nature. The Danish concept of 'hygge' aligns with your desire for meaningful connections.",
+    traits: ["diplomatic", "peaceful"]
+  },
+  ENFP: {
+    country: "Spain",
+    description: "Spain's vibrant culture, passionate people, and creative energy match your enthusiastic and warm personality. The Spanish lifestyle celebrates spontaneity and social connections.",
+    traits: ["energetic", "creative"]
+  },
+  ISTJ: {
+    country: "Switzerland",
+    description: "Switzerland's precision, reliability, and structured approach to life mirror your methodical nature. The country's respect for tradition and order aligns with your values.",
+    traits: ["structured", "peaceful"]
+  },
+  ISFJ: {
+    country: "Canada",
+    description: "Canada's friendly nature, strong sense of community, and respect for tradition match your caring and loyal personality. The culture's emphasis on helping others reflects your service-oriented nature.",
+    traits: ["peaceful", "diplomatic"]
+  },
+  ESTJ: {
+    country: "United Arab Emirates",
+    description: "The UAE's rapid development, structured growth, and traditional values align with your organized and practical nature. The nation's ambitious projects match your results-oriented approach.",
+    traits: ["structured", "energetic"]
+  },
+  ESFJ: {
+    country: "Italy",
+    description: "Italy's warm social culture, family values, and rich traditions resonate with your people-focused nature. The Italian emphasis on community and hospitality matches your caring personality.",
+    traits: ["diplomatic", "creative"]
+  },
+  ISTP: {
+    country: "Finland",
+    description: "Finland's practical approach to life, technological innovation, and appreciation for solitude match your analytical and independent nature. The Finnish love for problem-solving aligns with your skills.",
+    traits: ["analytical", "peaceful"]
+  },
+  ISFP: {
+    country: "Thailand",
+    description: "Thailand's artistic culture, beautiful landscapes, and gentle approach to life reflect your aesthetic sensitivity. The Thai appreciation for beauty and harmony matches your creative spirit.",
+    traits: ["creative", "peaceful"]
+  },
+  ESTP: {
+    country: "Australia",
+    description: "Australia's adventurous spirit, dynamic lifestyle, and direct communication style match your energetic and practical nature. The Australian outdoor culture suits your active personality.",
+    traits: ["energetic", "adventurous"]
+  },
+  ESFP: {
+    country: "Brazil",
+    description: "Brazil's vibrant culture, enthusiastic people, and celebratory spirit align with your fun-loving and spontaneous nature. The Brazilian joy for life matches your entertaining personality.",
+    traits: ["energetic", "creative"]
+  }
+};
+
+// Quiz questions array
+const questions = [
+  {
+    question: "How do you prefer to spend your weekends?",
+    options: [
+      { text: "Exploring new places and meeting people", trait: "energetic" },
+      { text: "Peaceful activities at home", trait: "peaceful" },
+      { text: "Organizing and planning activities", trait: "structured" },
+      { text: "Creative and artistic pursuits", trait: "creative" }
+    ]
+  },
+  {
+    question: "What's your approach to problem-solving?",
+    options: [
+      { text: "Analyze data and patterns", trait: "analytical" },
+      { text: "Consider everyone's perspectives", trait: "diplomatic" },
+      { text: "Trust your intuition", trait: "creative" },
+      { text: "Take immediate action", trait: "energetic" }
+    ]
+  },
+  {
+    question: "In group situations, you typically:",
+    options: [
+      { text: "Lead and organize", trait: "structured" },
+      { text: "Mediate and harmonize", trait: "diplomatic" },
+      { text: "Observe and analyze", trait: "analytical" },
+      { text: "Energize and entertain", trait: "energetic" }
+    ]
+  },
+  {
+    question: "What environment helps you work best?",
+    options: [
+      { text: "Quiet and organized space", trait: "structured" },
+      { text: "Peaceful natural setting", trait: "peaceful" },
+      { text: "Vibrant, dynamic environment", trait: "energetic" },
+      { text: "Artistic and inspiring space", trait: "creative" }
+    ]
+  },
+  {
+    question: "How do you make important decisions?",
+    options: [
+      { text: "Careful analysis of facts", trait: "analytical" },
+      { text: "Consider impact on others", trait: "diplomatic" },
+      { text: "Follow established methods", trait: "structured" },
+      { text: "Trust your inner voice", trait: "thoughtful" }
+    ]
+  },
+  {
+    question: "What's your ideal vacation?",
+    options: [
+      { text: "Adventure and exploration", trait: "adventurous" },
+      { text: "Relaxation and peace", trait: "peaceful" },
+      { text: "Cultural and artistic experiences", trait: "creative" },
+      { text: "Meeting new people", trait: "diplomatic" }
+    ]
+  },
+  {
+    question: "How do you handle stress?",
+    options: [
+      { text: "Create a detailed plan", trait: "structured" },
+      { text: "Seek quiet reflection", trait: "thoughtful" },
+      { text: "Physical activity", trait: "energetic" },
+      { text: "Creative expression", trait: "creative" }
+    ]
+  },
+  {
+    question: "What quality do you value most in others?",
+    options: [
+      { text: "Intelligence and competence", trait: "analytical" },
+      { text: "Kindness and diplomacy", trait: "diplomatic" },
+      { text: "Energy and enthusiasm", trait: "energetic" },
+      { text: "Creativity and uniqueness", trait: "creative" }
+    ]
+  },
+  {
+    question: "Your ideal project would involve:",
+    options: [
+      { text: "Solving complex problems", trait: "analytical" },
+      { text: "Helping and supporting others", trait: "diplomatic" },
+      { text: "Creating something new", trait: "creative" },
+      { text: "Leading a team", trait: "structured" }
+    ]
+  },
+  {
+    question: "What motivates you most?",
+    options: [
+      { text: "Achievement and success", trait: "structured" },
+      { text: "Harmony and peace", trait: "peaceful" },
+      { text: "Discovery and adventure", trait: "adventurous" },
+      { text: "Understanding and insight", trait: "thoughtful" }
+    ]
+  }
+];
+
+// P5.js setup function
+function setup() {
+  createCanvas(800, 600);
+  textAlign(CENTER, CENTER);
+  rectMode(CENTER);
+  colorMode(RGB);
+}
+
+// P5.js draw function
+function draw() {
+  background(240);
+  
+  switch(currentState) {
+    case 'welcome':
+      drawWelcome();
+      break;
+    case 'quiz':
+      drawQuestion();
+      break;
+    case 'result':
+      drawResult();
+      break;
+  }
+}
+
+// Welcome screen
+function drawWelcome() {
+  background(204, 204, 255);
+  
+  // Title with animation
+  let titleY = height/4 + sin(frameCount * 0.05) * 5;
+  textSize(40);
+  textFont('COURIER NE')
+  fill(50);
+  text("Discover Your MBTI Soul Country", width/2, titleY);
+  
+  // Description
+  textSize(22);
+  fill(80);
+  text("Are you meant for the sunny beaches of Spain, the vibrant sreets of Japan \nor the laid-back vibes of Australia\n\n Let's find out !!",width/2, height/2);
+  
+  // Start button
+  let btnY = height * 2/3;
+  let btnWidth = 200;
+  let btnHeight = 50;
+  
+  if (mouseX > width/2 - btnWidth/2 && mouseX < width/2 + btnWidth/2 &&
+      mouseY > btnY - btnHeight/2 && mouseY < btnY + btnHeight/2) {
+    fill(100, 150, 255);
+    buttonHover = true;
+  } else {
+    fill(0, 134, 179);
+    buttonHover = false;
+  }
+  
+  rect(width/2, btnY, btnWidth, btnHeight, 25);
+  fill(255);
+  textSize(24);
+  text("Begin Journey", width/2, btnY);
+}
+
+// Quiz screen
+function drawQuestion() {
+  let question = questions[currentQuestion];
+  
+  // Question number and progress
+  textSize(20);
+  fill(100,);
+  text(`Question ${currentQuestion + 1} of ${questions.length}`, width/2, 50);
+  
+  // Progress bar
+  noFill();
+  stroke(200);
+  rect(width/2, 80, 300, 10);
+  noStroke();
+  fill(70, 130, 255);
+  rect(width/2 - 150 + (300 * (currentQuestion + 1) / questions.length)/2, 80, 
+       300 * (currentQuestion + 1) / questions.length, 10);
+  
+  // Question text
+  textSize(24);
+  fill(0);
+  text(question.question, width/2, 150);
+  
+  // Options
+  question.options.forEach((option, index) => {
+    let btnY = 250 + index * 80;
+    let btnWidth = 600;
+    let btnHeight = 60;
+    
+    if (mouseX > width/2 - btnWidth/2 && mouseX < width/2 + btnWidth/2 &&
+        mouseY > btnY - btnHeight/2 && mouseY < btnY + btnHeight/2) {
+      fill(220, 230, 255);
+    } else {
+      fill(204, 255, 230);
+    }
+    
+    stroke(200);
+    rect(width/2, btnY, btnWidth, btnHeight, 10);
+    noStroke();
+    
+    fill(80);
+    textSize(18);
+    text(option.text, width/2, btnY);
+  });
+}
+
+// Results screen
+function drawResult() {
+  let profile = countryProfiles[result];
+  
+  // Background
+  background(255, 204, 230);
+  
+  // MBTI Type and Country
+  textSize(38);
+  textFont("courier ne")
+  fill(50);
+  text(`${result} - ${profile.country}`, width/2, height/7);
+  
+  // Description
+  textSize(20);
+  fill(80);
+  text(profile.description, width/2, height/4, width * 0.8);
+  
+  // Draw pie chart
+  drawPieChart(width/2, height * 0.7, 90);
+  
+  // Restart button
+  let btnY = height * 0.955;
+  if (mouseX > width/2 - 100 && mouseX < width/2 + 100 &&
+      mouseY > btnY - 25 && mouseY < btnY + 25) {
+    fill(70,130,255);
+  } else {
+    fill(0, 134, 179);
+  }
+  
+  rect(width/2, btnY, 90, 35, 45);
+  fill(255);
+  textSize(20);
+  text("Start Over", width/2, btnY);
+}
+
+// Pie chart drawing function
+function drawPieChart(x, y, radius) {
+  push();
+  translate(x, y);
+  
+  // Title
+  fill(50);
+  textSize(24);
+  textFont('courier ne')
+  text("Your Personality Traits", 0, -radius - 75);
+  
+  // Draw pie segments
+  let startAngle = 0;
+  pieChartAngles.forEach((angle, index) => {
+    let endAngle = startAngle + angle;
+    let midAngle = startAngle + angle/2;
+    
+    // Draw segment
+    fill(pieChartColors[pieChartLabels[index].trait]);
+    arc(0, 0, radius * 2, radius * 2, radians(startAngle), radians(endAngle));
+    
+    // Draw straight labels
+    let labelRadius = radius + 30;
+    let labelX = cos(radians(midAngle)) * labelRadius;
+    let labelY = sin(radians(midAngle)) * labelRadius;
+    
+    // Draw connection line
+    stroke(10);
+    line(cos(radians(midAngle)) * radius,
+         sin(radians(midAngle)) * radius,
+         labelX,
+         labelY);
+    noStroke();
+    
+    // Draw label background
+    fill(255);
+    rect(labelX, labelY, 120, 25);
+    
+    // Draw label text
+    fill(0);
+    textAlign(CENTER, CENTER);
+    textSize(14);
+    text(`${pieChartLabels[index].trait}: ${pieChartLabels[index].percentage}%`,
+         labelX,
+         labelY);
+    
+    startAngle = endAngle;
+  });
+  
+  pop();
+}
+
+// Mouse click handler
+// Continuing from mousePressed function...
+function mousePressed() {
+  if (currentState === 'welcome' && buttonHover) {
+    currentState = 'quiz';
+    return;
+  }
+  
+  if (currentState === 'quiz') {
+    let question = questions[currentQuestion];
+    question.options.forEach((option, index) => {
+      let btnY = 250 + index * 80;
+      if (mouseX > width/2 - 300 && mouseX < width/2 + 300 &&
+          mouseY > btnY - 30 && mouseY < btnY + 30) {
+        answers[currentQuestion] = option.trait;
+        if (currentQuestion < questions.length - 1) {
+          currentQuestion++;
+        } else {
+          calculateResult();
+          currentState = 'result';
+        }
+      }
+    });
+  }
+  
+  if (currentState === 'result' &&
+      mouseX > width/2 - 100 && mouseX < width/2 + 100 &&
+      mouseY > height * 0.9 - 25 && mouseY < height * 0.9 + 25) {
+    resetQuiz();
+  }
+}
+
+// Calculate final result and MBTI type
+function calculateResult() {
+  let traits = {};
+  Object.values(answers).forEach(trait => {
+    traits[trait] = (traits[trait] || 0) + 1;
+  });
+  
+  // Find dominant traits
+  let sortedTraits = Object.entries(traits)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 2)
+    .map(([trait]) => trait);
+  
+  // Match traits to MBTI profile
+  for (let [mbti, profile] of Object.entries(countryProfiles)) {
+    if (profile.traits.includes(sortedTraits[0]) && profile.traits.includes(sortedTraits[1])) {
+      result = mbti;
+      break;
+    }
+  }
+  
+  // Default to ENFP if no match found
+  if (!result) {
+    result = 'ENFP';
+  }
+  
+  calculatePieChart(traits);
+}
+
+// Calculate pie chart data
+function calculatePieChart(traits) {
+  pieChartAngles = [];
+  pieChartLabels = [];
+  
+  let total = Object.values(traits).reduce((a, b) => a + b, 0);
+  
+  Object.entries(traits).forEach(([trait, count]) => {
+    pieChartAngles.push((count / total) * 360);
+    pieChartLabels.push({
+      trait: trait,
+      percentage: ((count / total) * 100).toFixed(1)
+    });
+  });
+}
+
+// Reset quiz state
+function resetQuiz() {
+  currentState = 'welcome';
+  currentQuestion = 0;
+  answers = {};
+  result = null;
+  pieChartAngles = [];
+  pieChartLabels = [];
+  buttonHover = false;
+}
