@@ -1,4 +1,29 @@
-// Global variables for quiz state
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI Soul Country Quiz</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            font-family: 'Courier New', monospace;
+        }
+        canvas {
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+<script>
+  // Global variables for quiz state
 let currentState = 'welcome';
 let currentQuestion = 0;
 let answers = {};
@@ -198,285 +223,269 @@ const questions = [
   }
 ];
 
-// P5.js setup function
 function setup() {
-  createCanvas(800, 600);
-  textAlign(CENTER, CENTER);
-  rectMode(CENTER);
-  colorMode(RGB);
+    createCanvas(800, 600);
+    textAlign(CENTER, CENTER);
+    rectMode(CENTER);
+    colorMode(RGB);
 }
 
-// P5.js draw function
 function draw() {
-  background(240);
-  
-  switch(currentState) {
-    case 'welcome':
-      drawWelcome();
-      break;
-    case 'quiz':
-      drawQuestion();
-      break;
-    case 'result':
-      drawResult();
-      break;
-  }
+    background(240);
+    
+    switch(currentState) {
+        case 'welcome':
+            drawWelcome();
+            break;
+        case 'quiz':
+            drawQuestion();
+            break;
+        case 'result':
+            drawResult();
+            break;
+    }
 }
 
-// Welcome screen
 function drawWelcome() {
-  background(204, 204, 255);
-  
-  // Title with animation
-  let titleY = height/4 + sin(frameCount * 0.05) * 5;
-  textSize(40);
-  textFont('COURIER NE')
-  fill(50);
-  text("Discover Your MBTI Soul Country", width/2, titleY);
-  
-  // Description
-  textSize(22);
-  fill(80);
-  text("Are you meant for the sunny beaches of Spain, the vibrant sreets of Japan \nor the laid-back vibes of Australia\n\n Let's find out !!",width/2, height/2);
-  
-  // Start button
-  let btnY = height * 2/3;
-  let btnWidth = 200;
-  let btnHeight = 50;
-  
-  if (mouseX > width/2 - btnWidth/2 && mouseX < width/2 + btnWidth/2 &&
-      mouseY > btnY - btnHeight/2 && mouseY < btnY + btnHeight/2) {
-    fill(100, 150, 255);
-    buttonHover = true;
-  } else {
-    fill(0, 134, 179);
-    buttonHover = false;
-  }
-  
-  rect(width/2, btnY, btnWidth, btnHeight, 25);
-  fill(255);
-  textSize(24);
-  text("Begin Journey", width/2, btnY);
-}
-
-// Quiz screen
-function drawQuestion() {
-  let question = questions[currentQuestion];
-  
-  // Question number and progress
-  textSize(20);
-  fill(100,);
-  text(`Question ${currentQuestion + 1} of ${questions.length}`, width/2, 50);
-  
-  // Progress bar
-  noFill();
-  stroke(200);
-  rect(width/2, 80, 300, 10);
-  noStroke();
-  fill(70, 130, 255);
-  rect(width/2 - 150 + (300 * (currentQuestion + 1) / questions.length)/2, 80, 
-       300 * (currentQuestion + 1) / questions.length, 10);
-  
-  // Question text
-  textSize(24);
-  fill(0);
-  text(question.question, width/2, 150);
-  
-  // Options
-  question.options.forEach((option, index) => {
-    let btnY = 250 + index * 80;
-    let btnWidth = 600;
-    let btnHeight = 60;
+    background(204, 204, 255);
+    
+    let titleY = height/4 + sin(frameCount * 0.05) * 5;
+    textSize(40);
+    textFont('Courier New');
+    fill(50);
+    text("Discover Your MBTI Soul Country", width/2, titleY);
+    
+    textSize(22);
+    fill(80);
+    text("Are you meant for the sunny beaches of Spain, the vibrant streets of Japan\nor the laid-back vibes of Australia?\n\nLet's find out!", width/2, height/2);
+    
+    let btnY = height * 2/3;
+    let btnWidth = 200;
+    let btnHeight = 50;
     
     if (mouseX > width/2 - btnWidth/2 && mouseX < width/2 + btnWidth/2 &&
         mouseY > btnY - btnHeight/2 && mouseY < btnY + btnHeight/2) {
-      fill(220, 230, 255);
+        fill(100, 150, 255);
+        buttonHover = true;
     } else {
-      fill(204, 255, 230);
+        fill(0, 134, 179);
+        buttonHover = false;
     }
     
-    stroke(200);
-    rect(width/2, btnY, btnWidth, btnHeight, 10);
-    noStroke();
-    
-    fill(80);
-    textSize(18);
-    text(option.text, width/2, btnY);
-  });
-}
-
-// Results screen
-function drawResult() {
-  let profile = countryProfiles[result];
-  
-  // Background
-  background(255, 204, 230);
-  
-  // MBTI Type and Country
-  textSize(38);
-  textFont("courier ne")
-  fill(50);
-  text(`${result} - ${profile.country}`, width/2, height/7);
-  
-  // Description
-  textSize(20);
-  fill(80);
-  text(profile.description, width/2, height/4, width * 0.8);
-  
-  // Draw pie chart
-  drawPieChart(width/2, height * 0.7, 90);
-  
-  // Restart button
-  let btnY = height * 0.955;
-  if (mouseX > width/2 - 100 && mouseX < width/2 + 100 &&
-      mouseY > btnY - 25 && mouseY < btnY + 25) {
-    fill(70,130,255);
-  } else {
-    fill(0, 134, 179);
-  }
-  
-  rect(width/2, btnY, 90, 35, 45);
-  fill(255);
-  textSize(20);
-  text("Start Over", width/2, btnY);
-}
-
-// Pie chart drawing function
-function drawPieChart(x, y, radius) {
-  push();
-  translate(x, y);
-  
-  // Title
-  fill(50);
-  textSize(24);
-  textFont('courier ne')
-  text("Your Personality Traits", 0, -radius - 75);
-  
-  // Draw pie segments
-  let startAngle = 0;
-  pieChartAngles.forEach((angle, index) => {
-    let endAngle = startAngle + angle;
-    let midAngle = startAngle + angle/2;
-    
-    // Draw segment
-    fill(pieChartColors[pieChartLabels[index].trait]);
-    arc(0, 0, radius * 2, radius * 2, radians(startAngle), radians(endAngle));
-    
-    // Draw straight labels
-    let labelRadius = radius + 30;
-    let labelX = cos(radians(midAngle)) * labelRadius;
-    let labelY = sin(radians(midAngle)) * labelRadius;
-    
-    // Draw connection line
-    stroke(10);
-    line(cos(radians(midAngle)) * radius,
-         sin(radians(midAngle)) * radius,
-         labelX,
-         labelY);
-    noStroke();
-    
-    // Draw label background
+    rect(width/2, btnY, btnWidth, btnHeight, 25);
     fill(255);
-    rect(labelX, labelY, 120, 25);
-    
-    // Draw label text
-    fill(0);
-    textAlign(CENTER, CENTER);
-    textSize(14);
-    text(`${pieChartLabels[index].trait}: ${pieChartLabels[index].percentage}%`,
-         labelX,
-         labelY);
-    
-    startAngle = endAngle;
-  });
-  
-  pop();
+    textSize(24);
+    text("Begin Journey", width/2, btnY);
 }
 
-// Mouse click handler
-// Continuing from mousePressed function...
-function mousePressed() {
-  if (currentState === 'welcome' && buttonHover) {
-    currentState = 'quiz';
-    return;
-  }
-  
-  if (currentState === 'quiz') {
+function drawQuestion() {
     let question = questions[currentQuestion];
+    
+    textSize(20);
+    fill(100);
+    text(`Question ${currentQuestion + 1} of ${questions.length}`, width/2, 50);
+    
+    noFill();
+    stroke(200);
+    rect(width/2, 80, 300, 10);
+    noStroke();
+    fill(70, 130, 255);
+    rect(width/2 - 150 + (300 * (currentQuestion + 1) / questions.length)/2, 80, 
+         300 * (currentQuestion + 1) / questions.length, 10);
+    
+    textSize(24);
+    fill(0);
+    text(question.question, width/2, 150);
+    
     question.options.forEach((option, index) => {
-      let btnY = 250 + index * 80;
-      if (mouseX > width/2 - 300 && mouseX < width/2 + 300 &&
-          mouseY > btnY - 30 && mouseY < btnY + 30) {
-        answers[currentQuestion] = option.trait;
-        if (currentQuestion < questions.length - 1) {
-          currentQuestion++;
+        let btnY = 250 + index * 80;
+        let btnWidth = 600;
+        let btnHeight = 60;
+        
+        if (mouseX > width/2 - btnWidth/2 && mouseX < width/2 + btnWidth/2 &&
+            mouseY > btnY - btnHeight/2 && mouseY < btnY + btnHeight/2) {
+            fill(220, 230, 255);
         } else {
-          calculateResult();
-          currentState = 'result';
+            fill(204, 255, 230);
         }
-      }
+        
+        stroke(200);
+        rect(width/2, btnY, btnWidth, btnHeight, 10);
+        noStroke();
+        
+        fill(80);
+        textSize(18);
+        text(option.text, width/2, btnY);
     });
-  }
-  
-  if (currentState === 'result' &&
-      mouseX > width/2 - 100 && mouseX < width/2 + 100 &&
-      mouseY > height * 0.9 - 25 && mouseY < height * 0.9 + 25) {
-    resetQuiz();
-  }
 }
 
-// Calculate final result and MBTI type
-function calculateResult() {
-  let traits = {};
-  Object.values(answers).forEach(trait => {
-    traits[trait] = (traits[trait] || 0) + 1;
-  });
-  
-  // Find dominant traits
-  let sortedTraits = Object.entries(traits)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 2)
-    .map(([trait]) => trait);
-  
-  // Match traits to MBTI profile
-  for (let [mbti, profile] of Object.entries(countryProfiles)) {
-    if (profile.traits.includes(sortedTraits[0]) && profile.traits.includes(sortedTraits[1])) {
-      result = mbti;
-      break;
+function drawResult() {
+    let profile = countryProfiles[result];
+    
+    background(255, 204, 230);
+    
+    textSize(38);
+    textFont("Courier New");
+    fill(50);
+    text(`${result} - ${profile.country}`, width/2, height/7);
+    
+    textSize(20);
+    fill(80);
+    text(profile.description, width/2, height/4, width * 0.8);
+    
+    drawPieChart(width/2, height * 0.7, 90);
+    
+    let btnY = height * 0.955;
+    if (mouseX > width/2 - 100 && mouseX < width/2 + 100 &&
+        mouseY > btnY - 25 && mouseY < btnY + 25) {
+        fill(70,130,255);
+    } else {
+        fill(0, 134, 179);
     }
-  }
-  
-  // Default to ENFP if no match found
-  if (!result) {
-    result = 'ENFP';
-  }
-  
-  calculatePieChart(traits);
+    
+    rect(width/2, btnY, 90, 35, 45);
+    fill(255);
+    textSize(20);
+    text("Start Over", width/2, btnY);
 }
-
-// Calculate pie chart data
-function calculatePieChart(traits) {
-  pieChartAngles = [];
-  pieChartLabels = [];
-  
-  let total = Object.values(traits).reduce((a, b) => a + b, 0);
-  
-  Object.entries(traits).forEach(([trait, count]) => {
-    pieChartAngles.push((count / total) * 360);
-    pieChartLabels.push({
-      trait: trait,
-      percentage: ((count / total) * 100).toFixed(1)
+function drawPieChart(x, y, radius) {
+    push();
+    translate(x, y);
+    
+    fill(50);
+    textSize(24);
+    textFont('Courier New');
+    text("Your Personality Traits", 0, -radius - 75);
+    
+    let startAngle = 0;
+    pieChartAngles.forEach((angle, index) => {
+        let endAngle = startAngle + angle;
+        let midAngle = startAngle + angle/2;
+        
+        fill(...pieChartColors[pieChartLabels[index].trait]);
+        arc(0, 0, radius * 2, radius * 2, radians(startAngle), radians(endAngle));
+        
+        let labelRadius = radius + 30;
+        let labelX = cos(radians(midAngle)) * labelRadius;
+        let labelY = sin(radians(midAngle)) * labelRadius;
+        
+        stroke(10);
+        line(cos(radians(midAngle)) * radius,
+             sin(radians(midAngle)) * radius,
+             labelX,
+             labelY);
+        noStroke();
+        
+        fill(255);
+        rect(labelX, labelY, 120, 25);
+        
+        fill(0);
+        textAlign(CENTER, CENTER);
+        textSize(14);
+        text(`${pieChartLabels[index].trait}: ${pieChartLabels[index].percentage}%`,
+             labelX,
+             labelY);
+        
+        startAngle = endAngle;
     });
-  });
+    
+    pop();
 }
 
-// Reset quiz state
-function resetQuiz() {
-  currentState = 'welcome';
-  currentQuestion = 0;
-  answers = {};
-  result = null;
-  pieChartAngles = [];
-  pieChartLabels = [];
-  buttonHover = false;
+function mousePressed() {
+    if (currentState === 'welcome' && buttonHover) {
+        currentState = 'quiz';
+        return;
+    }
+    
+    if (currentState === 'quiz') {
+        let question = questions[currentQuestion];
+        question.options.forEach((option, index) => {
+            let btnY = 250 + index * 80;
+            if (mouseX > width/2 - 300 && mouseX < width/2 + 300 &&
+                mouseY > btnY - 30 && mouseY < btnY + 30) {
+                answers[currentQuestion] = option.trait;
+                if (currentQuestion < questions.length - 1) {
+                    currentQuestion++;
+                } else {
+                    calculateResult();
+                    currentState = 'result';
+                }
+            }
+        });
+    }
+    
+    if (currentState === 'result' &&
+        mouseX > width/2 - 45 && mouseX < width/2 + 45 &&
+        mouseY > height * 0.955 - 17.5 && mouseY < height * 0.955 + 17.5) {
+        resetQuiz();
+    }
 }
+
+function calculateResult() {
+    let traits = {};
+    Object.values(answers).forEach(trait => {
+        traits[trait] = (traits[trait] || 0) + 1;
+    });
+    
+    let sortedTraits = Object.entries(traits)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2)
+        .map(([trait]) => trait);
+    
+    for (let [mbti, profile] of Object.entries(countryProfiles)) {
+        if (profile.traits.includes(sortedTraits[0]) && profile.traits.includes(sortedTraits[1])) {
+            result = mbti;
+            break;
+        }
+    }
+    
+    if (!result) {
+        result = 'ENFP';
+    }
+    
+    calculatePieChart(traits);
+}
+
+function calculatePieChart(traits) {
+    pieChartAngles = [];
+    pieChartLabels = [];
+    
+    let total = Object.values(traits).reduce((a, b) => a + b, 0);
+    
+    Object.entries(traits).forEach(([trait, count]) => {
+        pieChartAngles.push((count / total) * 360);
+        pieChartLabels.push({
+            trait: trait,
+            percentage: ((count / total) * 100).toFixed(1)
+        });
+    });
+}
+
+function resetQuiz() {
+    currentState = 'welcome';
+    currentQuestion = 0;
+    answers = {};
+    result = null;
+    pieChartAngles = [];
+    pieChartLabels = [];
+    buttonHover = false;
+}
+</script>
+</body>
+</html>
+   
+
+ 
+  
+
+
+
+ 
+
+ 
+  
+
+
+
+  
