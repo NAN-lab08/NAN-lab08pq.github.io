@@ -251,7 +251,6 @@ function drawWelcome() {
     
     let titleY = height/4 + sin(frameCount * 0.05) * 5;
     textSize(40);
-    textFont('Courier New');
     fill(50);
     text("Discover Your MBTI Soul Country", width/2, titleY);
     
@@ -325,7 +324,6 @@ function drawResult() {
     background(255, 204, 230);
     
     textSize(38);
-    textFont("Courier New");
     fill(50);
     text(`${result} - ${profile.country}`, width/2, height/7);
     
